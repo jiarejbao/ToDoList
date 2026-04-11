@@ -1,0 +1,391 @@
+/* Task and UI Components */
+
+/* ==================== Task Card ==================== */
+.task-card {
+    background-color: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    padding: var(--space-md);
+    margin-bottom: var(--space-sm);
+    transition: all 0.15s ease;
+    cursor: grab;
+}
+
+.task-card:hover {
+    background-color: rgba(255, 255, 255, 0.04);
+    border-color: var(--border-standard);
+}
+
+.task-card.dragging {
+    opacity: 0.5;
+    cursor: grabbing;
+}
+
+.task-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.task-checkbox {
+    width: 18px;
+    height: 18px;
+    border: 2px solid var(--border-secondary);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s ease;
+    flex-shrink: 0;
+}
+
+.task-checkbox:hover {
+    border-color: var(--brand-accent);
+}
+
+.task-checkbox.checked {
+    background-color: var(--success);
+    border-color: var(--success);
+}
+
+.task-checkbox.checked::after {
+    content: '✓';
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.task-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.task-title {
+    font-size: 0.9375rem;
+    font-weight: 510;
+    color: var(--text-primary);
+    margin-bottom: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.task-description {
+    font-size: 0.8125rem;
+    color: var(--text-tertiary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.task-meta {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    margin-top: var(--space-xs);
+}
+
+.task-date {
+    font-size: 0.75rem;
+    color: var(--text-quaternary);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.task-date.overdue {
+    color: var(--error);
+}
+
+.task-date.today {
+    color: var(--warning);
+}
+
+.task-actions {
+    display: flex;
+    gap: 4px;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+}
+
+.task-card:hover .task-actions {
+    opacity: 1;
+}
+
+.task-btn {
+    width: 28px;
+    height: 28px;
+    border: none;
+    background-color: transparent;
+    color: var(--text-tertiary);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.875rem;
+    transition: all 0.15s ease;
+}
+
+.task-btn:hover {
+    background-color: rgba(255, 255, 255, 0.08);
+    color: var(--text-primary);
+}
+
+.task-btn.delete:hover {
+    background-color: rgba(239, 68, 68, 0.2);
+    color: var(--error);
+}
+
+/* ==================== Priority Badge ==================== */
+.priority-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    border-radius: var(--radius-full);
+    font-size: 0.6875rem;
+    font-weight: 590;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.priority-p1 {
+    background-color: rgba(100, 116, 139, 0.2);
+    color: #94a3b8;
+}
+
+.priority-p2 {
+    background-color: rgba(94, 106, 210, 0.2);
+    color: var(--brand-accent);
+}
+
+.priority-p3 {
+    background-color: rgba(245, 158, 11, 0.2);
+    color: var(--warning);
+}
+
+.priority-p4 {
+    background-color: rgba(239, 68, 68, 0.2);
+    color: var(--error);
+}
+
+/* ==================== Subtask List ==================== */
+.subtasks-container {
+    margin-left: 28px;
+    margin-top: var(--space-sm);
+    padding-left: var(--space-md);
+    border-left: 2px solid var(--border-subtle);
+}
+
+.subtask-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-xs) 0;
+    cursor: grab;
+}
+
+.subtask-item:hover {
+    background-color: rgba(255, 255, 255, 0.02);
+    border-radius: var(--radius-sm);
+}
+
+.subtask-item.dragging {
+    opacity: 0.5;
+}
+
+.subtask-checkbox {
+    width: 14px;
+    height: 14px;
+    border: 2px solid var(--border-secondary);
+    border-radius: 3px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.subtask-checkbox:hover {
+    border-color: var(--brand-accent);
+}
+
+.subtask-checkbox.checked {
+    background-color: var(--success);
+    border-color: var(--success);
+}
+
+.subtask-checkbox.checked::after {
+    content: '✓';
+    color: white;
+    font-size: 0.625rem;
+}
+
+.subtask-content {
+    flex: 1;
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.subtask-content.completed {
+    text-decoration: line-through;
+    color: var(--text-quaternary);
+}
+
+/* ==================== Empty State ==================== */
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-xl) var(--space-lg);
+    color: var(--text-tertiary);
+    text-align: center;
+}
+
+.empty-icon {
+    font-size: 3rem;
+    margin-bottom: var(--space-md);
+    opacity: 0.5;
+}
+
+.empty-title {
+    font-size: 1.125rem;
+    font-weight: 510;
+    color: var(--text-secondary);
+    margin-bottom: var(--space-xs);
+}
+
+.empty-description {
+    font-size: 0.9375rem;
+    color: var(--text-quaternary);
+}
+
+/* ==================== Subtask Form Item ==================== */
+.subtask-form-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-sm);
+    background-color: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--space-xs);
+}
+
+.subtask-form-item input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: var(--text-primary);
+    font-size: 0.875rem;
+    outline: none;
+}
+
+.subtask-form-item input::placeholder {
+    color: var(--text-quaternary);
+}
+
+.subtask-form-item select {
+    width: 60px;
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+    outline: none;
+}
+
+.subtask-form-item .btn-remove {
+    width: 24px;
+    height: 24px;
+    border: none;
+    background: transparent;
+    color: var(--text-quaternary);
+    cursor: pointer;
+    border-radius: var(--radius-sm);
+    transition: all 0.15s ease;
+}
+
+.subtask-form-item .btn-remove:hover {
+    background-color: rgba(239, 68, 68, 0.2);
+    color: var(--error);
+}
+
+/* ==================== Trash/Completed Item ==================== */
+.archive-item {
+    background-color: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    padding: var(--space-md);
+    margin-bottom: var(--space-sm);
+}
+
+.archive-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.archive-title {
+    font-size: 0.9375rem;
+    font-weight: 510;
+    color: var(--text-secondary);
+    text-decoration: line-through;
+}
+
+.archive-meta {
+    display: flex;
+    gap: var(--space-sm);
+    margin-top: var(--space-xs);
+    font-size: 0.75rem;
+    color: var(--text-quaternary);
+}
+
+.archive-actions {
+    display: flex;
+    gap: var(--space-xs);
+}
+
+.archive-btn {
+    padding: 4px 12px;
+    border: 1px solid var(--border-standard);
+    background-color: transparent;
+    color: var(--text-secondary);
+    border-radius: var(--radius-sm);
+    font-size: 0.8125rem;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.archive-btn:hover {
+    background-color: rgba(255, 255, 255, 0.04);
+    border-color: var(--border-secondary);
+}
+
+.archive-btn.restore {
+    border-color: var(--success);
+    color: var(--success);
+}
+
+.archive-btn.restore:hover {
+    background-color: rgba(16, 185, 129, 0.1);
+}
+
+.archive-btn.delete {
+    border-color: var(--error);
+    color: var(--error);
+}
+
+.archive-btn.delete:hover {
+    background-color: rgba(239, 68, 68, 0.1);
+}
+
+/* ==================== Drag Over Indicator ==================== */
+.drag-over {
+    border: 2px dashed var(--brand-accent);
+    background-color: rgba(113, 112, 255, 0.05);
+}

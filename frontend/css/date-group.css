@@ -1,0 +1,187 @@
+/* Date Grouping Styles */
+
+/* ==================== Date Group Container ==================== */
+.date-group {
+    margin-bottom: var(--space-lg);
+}
+
+.date-group-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-sm) 0;
+    margin-bottom: var(--space-sm);
+    border-bottom: 1px solid var(--border-subtle);
+}
+
+.date-group-title {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.date-label {
+    font-size: 0.9375rem;
+    font-weight: 590;
+    color: var(--text-primary);
+}
+
+.date-badge {
+    font-size: 0.75rem;
+    font-weight: 510;
+    padding: 2px 8px;
+    border-radius: var(--radius-full);
+    background-color: rgba(255, 255, 255, 0.06);
+    color: var(--text-tertiary);
+}
+
+.date-badge.today {
+    background-color: var(--brand-primary);
+    color: white;
+}
+
+.date-badge.tomorrow {
+    background-color: rgba(94, 106, 210, 0.3);
+    color: var(--brand-accent);
+}
+
+.date-count {
+    font-size: 0.8125rem;
+    color: var(--text-quaternary);
+}
+
+/* ==================== Task List within Date Group ==================== */
+.date-task-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+}
+
+/* ==================== No Date Group ==================== */
+.date-group.no-date .date-group-header {
+    border-bottom-color: var(--border-secondary);
+}
+
+.date-group.no-date .date-label {
+    color: var(--text-tertiary);
+    font-style: italic;
+}
+
+/* ==================== Past Date ==================== */
+.date-group.past .date-label {
+    color: var(--text-quaternary);
+}
+
+.date-group.past .date-badge {
+    background-color: rgba(239, 68, 68, 0.1);
+    color: var(--error);
+}
+
+/* ==================== Future Date ==================== */
+.date-group.future .date-label {
+    color: var(--text-secondary);
+}
+
+/* ==================== Calendar View ==================== */
+.calendar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--space-lg);
+}
+
+.calendar-nav {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.calendar-title {
+    font-size: 1.125rem;
+    font-weight: 590;
+    color: var(--text-primary);
+    min-width: 150px;
+    text-align: center;
+}
+
+.calendar-btn {
+    width: 32px;
+    height: 32px;
+    border: 1px solid var(--border-standard);
+    background-color: transparent;
+    color: var(--text-secondary);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s ease;
+}
+
+.calendar-btn:hover {
+    background-color: rgba(255, 255, 255, 0.04);
+    border-color: var(--border-secondary);
+}
+
+/* ==================== Compact Date View ==================== */
+.task-date-inline {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.75rem;
+    color: var(--text-quaternary);
+    padding: 2px 8px;
+    background-color: rgba(255, 255, 255, 0.03);
+    border-radius: var(--radius-sm);
+}
+
+.task-date-inline.overdue {
+    background-color: rgba(239, 68, 68, 0.1);
+    color: var(--error);
+}
+
+.task-date-inline.today {
+    background-color: rgba(245, 158, 11, 0.1);
+    color: var(--warning);
+}
+
+/* ==================== Date Filter ==================== */
+.date-filter {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-sm) var(--space-md);
+    background-color: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    margin-bottom: var(--space-lg);
+}
+
+.date-filter-label {
+    font-size: 0.8125rem;
+    color: var(--text-tertiary);
+    white-space: nowrap;
+}
+
+.date-filter-input {
+    background: transparent;
+    border: none;
+    color: var(--text-primary);
+    font-family: inherit;
+    font-size: 0.9375rem;
+    outline: none;
+    cursor: pointer;
+}
+
+.date-filter-clear {
+    font-size: 0.75rem;
+    color: var(--brand-accent);
+    cursor: pointer;
+    padding: 2px 8px;
+    border-radius: var(--radius-sm);
+    transition: all 0.15s ease;
+}
+
+.date-filter-clear:hover {
+    background-color: rgba(113, 112, 255, 0.1);
+}

@@ -1,0 +1,141 @@
+"""
+Task business logic
+"""
+from datetime import datetime
+from typing import List, Optional
+
+from sqlalchemy import select, update, desc, asc
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from models.database import Task, Subtask
+from models.schemas import TaskCreate, TaskUpdate, TaskOrderUpdate
+
+
+async def create_task(db: AsyncSession, task_data: TaskCreate) -> Task:
+    """Create a new task with optional subtasks"""
+    # Create task
+    task = Task(
+        content=task_data.content,
+        description=task_data.description,
+        due_date=task_data.due_date,
+        priority=task_data.priority,
+        order_index=task_data.order_index,
+    )
+    db.add(task)
+    await db.commit()
+    await db.refresh(task)
+    
+    # Create subtasks if provided
+    if task_data.subtasks:
+        for i, subtask_data in enumerate(task_data.subtasks):
+            subtask = Subtask(
+                task_id=task.id,
+                content=subtask_data.content,
+                description=subtask_data.description,
+                due_date=subtask_data.due_date,
+                priority=subtask_data.priority,
+                order_index=subtask_data.order_index or i,
+            )
+            db.add(subtask)
+        await db.commit()
+    
+    # Refresh to get subtasks
+    await db.refresh(task)
+    return task
+
+
+async def get_task(db: AsyncSession, task_id: int) -> Optional[Task]:
+    """Get a single task by ID with subtasks"""
+    result = await db.execute(
+        select(Task).where(Task.id == task_id)
+    )
+    return result.scalar_one_or_none()
+
+
+async def get_tasks(
+    db: AsyncSession,
+    priority: Optional[int] = None,
+    date_from: Optional[str] = None,
+    date_to: Optional[str] = None,
+) -> List[Task]:
+    """Get all active tasks with optional filters"""
+    query = select(Task).order_by(asc(Task.order_index))
+    
+    if priority:
+        query = query.where(Task.priority == priority)
+    
+    if date_from:
+        query = query.where(Task.due_date >= date_from)
+    
+    if date_to:
+        query = query.where(Task.due_date <= date_to)
+    
+    result = await db.execute(query)
+    return result.scalars().all()
+
+
+async def update_task(db: AsyncSession, task_id: int, task_data: TaskUpdate) -> Optional[Task]:
+    """Update a task"""
+    task = await get_task(db, task_id)
+    if not task:
+        return None
+    
+    # Update fields
+    update_data = task_data.model_dump(exclude_unset=True)
+    for field, value in update_data.items():
+        setattr(task, field, value)
+    
+    task.updated_at = datetime.utcnow()
+    await db.commit()
+    await db.refresh(task)
+    return task
+
+
+async def delete_task(db: AsyncSession, task_id: int) -> bool:
+    """Delete a task (move to trash)"""
+    task = await get_task(db, task_id)
+    if not task:
+        return False
+    
+    await db.delete(task)
+    await db.commit()
+    return True
+
+
+async def update_task_order(db: AsyncSession, task_id: int, new_order: int) -> Optional[Task]:
+    """Update task order index with reordering of affected tasks"""
+    task = await get_task(db, task_id)
+    if not task:
+        return None
+    
+    old_order = task.order_index
+    
+    if new_order == old_order:
+        return task
+    
+    if new_order > old_order:
+        # Moving down: decrement tasks between old+1 and new
+        await db.execute(
+            update(Task)
+            .where(Task.order_index > old_order, Task.order_index <= new_order)
+            .values(order_index=Task.order_index - 1)
+        )
+    else:
+        # Moving up: increment tasks between new and old-1
+        await db.execute(
+            update(Task)
+            .where(Task.order_index >= new_order, Task.order_index < old_order)
+            .values(order_index=Task.order_index + 1)
+        )
+    
+    task.order_index = new_order
+    await db.commit()
+    await db.refresh(task)
+    return task
+
+
+async def get_max_order(db: AsyncSession) -> int:
+    """Get the maximum order index for tasks"""
+    result = await db.execute(select(Task.order_index).order_by(desc(Task.order_index)).limit(1))
+    max_order = result.scalar()
+    return max_order if max_order is not None else -1
