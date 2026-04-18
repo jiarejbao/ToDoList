@@ -4,7 +4,7 @@ Subtask business logic
 from datetime import datetime
 from typing import List, Optional
 
-from sqlalchemy import select, update, asc
+from sqlalchemy import select, update, delete, asc
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from models.database import Subtask, Task
@@ -71,6 +71,37 @@ async def delete_subtask(db: AsyncSession, subtask_id: int) -> bool:
     if not subtask:
         return False
     
+    await db.delete(subtask)
+    await db.commit()
+    return True
+
+
+async def complete_subtask(db: AsyncSession, subtask_id: int) -> bool:
+    """Mark a subtask as complete, clean up related notes and dependencies"""
+    subtask = await get_subtask(db, subtask_id)
+    if not subtask:
+        return False
+    
+    # Cascade delete related notes and dependencies
+    from models.database import SubtaskNote, SubtaskDependency
+    
+    # Delete subtask note if exists
+    note_result = await db.execute(
+        select(SubtaskNote).where(SubtaskNote.subtask_id == subtask_id)
+    )
+    note = note_result.scalar_one_or_none()
+    if note:
+        await db.delete(note)
+    
+    # Delete related dependencies
+    await db.execute(
+        delete(SubtaskDependency).where(
+            (SubtaskDependency.from_subtask_id == subtask_id) |
+            (SubtaskDependency.to_subtask_id == subtask_id)
+        )
+    )
+    
+    # Delete the subtask itself
     await db.delete(subtask)
     await db.commit()
     return True

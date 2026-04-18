@@ -9,7 +9,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
@@ -20,7 +20,7 @@ from services.trash_service import cleanup_expired_tasks
 from models.database import AsyncSessionLocal
 
 # Import routers
-from routers import tasks, subtasks, calendar, completed, trash
+from routers import tasks, subtasks, calendar, completed, trash, notes, workflow
 
 
 @asynccontextmanager
@@ -68,6 +68,8 @@ app.include_router(subtasks.router, prefix="/api/v1")
 app.include_router(calendar.router, prefix="/api/v1")
 app.include_router(completed.router, prefix="/api/v1")
 app.include_router(trash.router, prefix="/api/v1")
+app.include_router(notes.router, prefix="/api/v1")
+app.include_router(workflow.router, prefix="/api/v1")
 
 # Static files for frontend
 frontend_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "frontend")
@@ -84,6 +86,24 @@ async def root():
     return {"message": "ToDoList API", "docs": "/docs"}
 
 
+@app.get("/task.html")
+async def task_page():
+    """Serve task detail page"""
+    task_path = os.path.join(frontend_path, "task.html")
+    if os.path.exists(task_path):
+        return FileResponse(task_path)
+    raise HTTPException(status_code=404, detail="Task page not found")
+
+
+@app.get("/note.html")
+async def note_page():
+    """Serve subtask note page"""
+    note_path = os.path.join(frontend_path, "note.html")
+    if os.path.exists(note_path):
+        return FileResponse(note_path)
+    raise HTTPException(status_code=404, detail="Note page not found")
+
+
 @app.get("/api/v1/health")
 async def health_check():
     """Health check endpoint"""
@@ -95,7 +115,7 @@ if __name__ == "__main__":
     
     uvicorn.run(
         "main:app",
-        host="0.0.0.0",
+        host="127.0.0.1",
         port=8000,
         reload=APP_CONFIG["debug"],
         log_level="info"

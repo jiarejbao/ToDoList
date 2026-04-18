@@ -149,6 +149,60 @@ class DeletedSubtask(Base):
     task = relationship("DeletedTask", back_populates="subtasks")
 
 
+# ==================== Task Notes ====================
+
+class TaskNote(Base):
+    """Task-level notes (1:1 with tasks)"""
+    __tablename__ = "task_notes"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    task_id = Column(Integer, ForeignKey("tasks.id", ondelete="CASCADE"), nullable=False)
+    content = Column(Text, nullable=False, default="")
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    __table_args__ = (
+        Index('idx_task_note_task_id', 'task_id'),
+    )
+
+
+# ==================== Subtask Notes ====================
+
+class SubtaskNote(Base):
+    """Subtask-level notes (1:1 with subtasks)"""
+    __tablename__ = "subtask_notes"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    subtask_id = Column(Integer, ForeignKey("subtasks.id", ondelete="CASCADE"), nullable=False)
+    content = Column(Text, nullable=False, default="")
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    __table_args__ = (
+        Index('idx_subtask_note_subtask_id', 'subtask_id'),
+    )
+
+
+# ==================== Subtask Dependencies (Workflow) ====================
+
+class SubtaskDependency(Base):
+    """Subtask dependency edges for workflow visualization"""
+    __tablename__ = "subtask_dependencies"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    task_id = Column(Integer, ForeignKey("tasks.id", ondelete="CASCADE"), nullable=False)
+    from_subtask_id = Column(Integer, ForeignKey("subtasks.id", ondelete="CASCADE"), nullable=False)
+    to_subtask_id = Column(Integer, ForeignKey("subtasks.id", ondelete="CASCADE"), nullable=False)
+    dependency_type = Column(String(20), default="BLOCKS")
+    created_at = Column(DateTime, default=datetime.utcnow)
+    
+    __table_args__ = (
+        Index('idx_dep_task_id', 'task_id'),
+        Index('idx_dep_from', 'from_subtask_id'),
+        Index('idx_dep_to', 'to_subtask_id'),
+    )
+
+
 # Database dependency
 async def get_db():
     """Async database session dependency"""

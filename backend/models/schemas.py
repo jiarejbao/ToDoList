@@ -161,3 +161,54 @@ class APIResponse(BaseModel):
 class ErrorResponse(BaseModel):
     success: bool = False
     error: dict
+
+
+# ==================== Note Schemas ====================
+
+class NoteCreate(BaseModel):
+    content: str = Field(default="", description="Markdown/HTML content")
+
+
+class NoteResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    
+    id: Optional[int] = None
+    task_id: Optional[int] = None
+    subtask_id: Optional[int] = None
+    content: str = ""
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
+
+
+# ==================== Workflow Schemas ====================
+
+class DependencyCreate(BaseModel):
+    from_subtask_id: int = Field(..., description="Source subtask ID")
+    to_subtask_id: int = Field(..., description="Target subtask ID")
+    dependency_type: Optional[str] = Field(default="BLOCKS", pattern="^(BLOCKS|REQUIRES|TRIGGERS)$")
+
+
+class DependencyResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    
+    id: int
+    task_id: int
+    from_subtask_id: int
+    to_subtask_id: int
+    dependency_type: str
+    created_at: datetime
+
+
+class WorkflowNode(BaseModel):
+    data: dict
+
+
+class WorkflowEdge(BaseModel):
+    data: dict
+
+
+class WorkflowResponse(BaseModel):
+    task_id: int
+    task_name: str
+    nodes: List[WorkflowNode]
+    edges: List[WorkflowEdge]

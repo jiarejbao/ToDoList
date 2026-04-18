@@ -6,6 +6,7 @@ from typing import List, Optional
 
 from sqlalchemy import select, update, desc, asc
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from models.database import Task, Subtask
 from models.schemas import TaskCreate, TaskUpdate, TaskOrderUpdate
@@ -39,15 +40,17 @@ async def create_task(db: AsyncSession, task_data: TaskCreate) -> Task:
             db.add(subtask)
         await db.commit()
     
-    # Refresh to get subtasks
-    await db.refresh(task)
-    return task
+    # Refresh and reload with subtasks
+    result = await db.execute(
+        select(Task).where(Task.id == task.id).options(selectinload(Task.subtasks))
+    )
+    return result.scalar_one()
 
 
 async def get_task(db: AsyncSession, task_id: int) -> Optional[Task]:
     """Get a single task by ID with subtasks"""
     result = await db.execute(
-        select(Task).where(Task.id == task_id)
+        select(Task).where(Task.id == task_id).options(selectinload(Task.subtasks))
     )
     return result.scalar_one_or_none()
 
@@ -59,7 +62,7 @@ async def get_tasks(
     date_to: Optional[str] = None,
 ) -> List[Task]:
     """Get all active tasks with optional filters"""
-    query = select(Task).order_by(asc(Task.order_index))
+    query = select(Task).options(selectinload(Task.subtasks)).order_by(asc(Task.order_index))
     
     if priority:
         query = query.where(Task.priority == priority)
