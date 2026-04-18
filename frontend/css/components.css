@@ -27,6 +27,18 @@
     gap: var(--space-sm);
 }
 
+.task-card-clickable {
+    cursor: pointer;
+}
+
+.task-card-clickable .task-title {
+    transition: color 0.15s ease;
+}
+
+.task-card-clickable:hover .task-title {
+    color: var(--brand-accent);
+}
+
 .task-checkbox {
     width: 18px;
     height: 18px;

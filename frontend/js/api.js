@@ -84,13 +84,54 @@ const TaskAPI = {
             body: JSON.stringify({ order_index: orderIndex }),
         });
     },
+    
+    // Get task by ID (alias for get)
+    async getById(id) {
+        return this.get(id);
+    },
+    
+    // Get subtask
+    async getSubtask(id) {
+        return apiFetch(`/subtasks/${id}`);
+    },
+    
+    // Get task note
+    async getTaskNote(taskId) {
+        return apiFetch(`/tasks/${taskId}/note`);
+    },
+    
+    // Update task note
+    async updateTaskNote(taskId, data) {
+        return apiFetch(`/tasks/${taskId}/note`, {
+            method: 'PUT',
+            body: JSON.stringify(data),
+        });
+    },
+    
+    // Get subtask note
+    async getSubtaskNote(subtaskId) {
+        return apiFetch(`/subtasks/${subtaskId}/note`);
+    },
+    
+    // Update subtask note
+    async updateSubtaskNote(subtaskId, data) {
+        return apiFetch(`/subtasks/${subtaskId}/note`, {
+            method: 'PUT',
+            body: JSON.stringify(data),
+        });
+    },
+    
+    // Get workflow for task
+    async getWorkflow(taskId) {
+        return apiFetch(`/tasks/${taskId}/workflow`);
+    },
 };
 
 // Subtask APIs
 const SubtaskAPI = {
     // Create subtask
     async create(taskId, data) {
-        return apiFetch(`/tasks/${taskId}/subtasks`, {
+        return apiFetch(`/subtasks/tasks/${taskId}/subtasks`, {
             method: 'POST',
             body: JSON.stringify(data),
         });

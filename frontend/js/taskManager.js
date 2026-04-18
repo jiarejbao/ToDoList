@@ -152,7 +152,7 @@ const TaskManager = {
         
         return `
             <div class="task-card" data-id="${task.id}" draggable="true">
-                <div class="task-header">
+                <div class="task-header task-card-clickable" data-id="${task.id}">
                     <div class="task-checkbox" data-id="${task.id}"></div>
                     <div class="task-content">
                         <div class="task-title">${task.content}</div>
@@ -175,6 +175,20 @@ const TaskManager = {
     
     // Bind task events
     bindTaskEvents() {
+        // Click on task card header to open task detail page
+        document.querySelectorAll('.task-card-clickable').forEach(header => {
+            header.addEventListener('click', (e) => {
+                // Don't navigate if clicking on checkbox, buttons, or subtask elements
+                if (e.target.closest('.task-checkbox') ||
+                    e.target.closest('.task-actions') ||
+                    e.target.closest('.subtasks-container')) {
+                    return;
+                }
+                const taskId = parseInt(header.dataset.id);
+                window.location.href = `/task.html?id=${taskId}`;
+            });
+        });
+
         // Complete task
         document.querySelectorAll('.task-checkbox').forEach(checkbox => {
             checkbox.addEventListener('click', async (e) => {
