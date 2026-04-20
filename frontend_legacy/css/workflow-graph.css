@@ -1,0 +1,89 @@
+/* Cytoscape.js Workflow Graph Styles */
+
+.workflow-graph-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.workflow-graph-container #cy {
+    width: 100%;
+    height: 100%;
+    background: transparent;
+}
+
+/* Graph controls overlay */
+.graph-controls {
+    display: flex;
+    gap: 6px;
+}
+
+.graph-control-btn {
+    width: 32px;
+    height: 32px;
+    background: #191a1b;
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 6px;
+    color: #8a8f98;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 16px;
+    transition: all 0.15s ease;
+}
+
+.graph-control-btn:hover {
+    background: #28282c;
+    color: #f7f8f8;
+}
+
+/* Legend inline */
+.graph-legend-inline {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: #8a8f98;
+}
+
+.legend-line {
+    width: 20px;
+    height: 2px;
+    border-radius: 1px;
+}
+
+.legend-line.blocks { background: #5e6ad2; }
+.legend-line.requires { background: #10b981; }
+.legend-line.triggers { background: #f59e0b; }
+
+/* Edge hover delete hint */
+.edge-delete-hint {
+    position: absolute;
+    background: #ef4444;
+    color: white;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    cursor: pointer;
+    pointer-events: none;
+}
+
+/* Cytoscape dimmed state */
+.cy-node-dimmed {
+    opacity: 0.25;
+}
+
+.cy-edge-dimmed {
+    opacity: 0.15;
+}

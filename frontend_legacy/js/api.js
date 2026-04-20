@@ -280,6 +280,34 @@ const TrashAPI = {
     },
 };
 
+// Workflow APIs
+const WorkflowAPI = {
+    // Create dependency
+    async createDependency(taskId, data) {
+        return apiFetch(`/tasks/${taskId}/dependencies`, {
+            method: 'POST',
+            body: JSON.stringify(data),
+        });
+    },
+    
+    // Delete dependency
+    async deleteDependency(depId) {
+        return apiFetch(`/dependencies/${depId}`, {
+            method: 'DELETE',
+        });
+    },
+    
+    // Get upstream dependencies
+    async getUpstream(subtaskId) {
+        return apiFetch(`/subtasks/${subtaskId}/upstream`);
+    },
+    
+    // Get downstream dependencies
+    async getDownstream(subtaskId) {
+        return apiFetch(`/subtasks/${subtaskId}/downstream`);
+    },
+};
+
 // Health check
 const HealthAPI = {
     async check() {

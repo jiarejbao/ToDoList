@@ -18,7 +18,7 @@ class SubtaskBase(BaseModel):
 
 
 class SubtaskCreate(SubtaskBase):
-    pass
+    id: Optional[int] = None  # For updates: existing subtask ID
 
 
 class SubtaskUpdate(BaseModel):
@@ -57,6 +57,7 @@ class TaskUpdate(BaseModel):
     description: Optional[str] = None
     due_date: Optional[date] = None
     priority: Optional[int] = Field(None, ge=1, le=4)
+    subtasks: Optional[List[SubtaskCreate]] = None
 
 
 class TaskOrderUpdate(BaseModel):

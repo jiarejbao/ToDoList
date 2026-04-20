@@ -71,43 +71,16 @@ app.include_router(trash.router, prefix="/api/v1")
 app.include_router(notes.router, prefix="/api/v1")
 app.include_router(workflow.router, prefix="/api/v1")
 
-# Static files for frontend
-frontend_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "frontend")
-if os.path.exists(frontend_path):
-    app.mount("/static", StaticFiles(directory=frontend_path), name="static")
-
-
-@app.get("/")
-async def root():
-    """Root endpoint - serve index.html"""
-    index_path = os.path.join(frontend_path, "index.html")
-    if os.path.exists(index_path):
-        return FileResponse(index_path)
-    return {"message": "ToDoList API", "docs": "/docs"}
-
-
-@app.get("/task.html")
-async def task_page():
-    """Serve task detail page"""
-    task_path = os.path.join(frontend_path, "task.html")
-    if os.path.exists(task_path):
-        return FileResponse(task_path)
-    raise HTTPException(status_code=404, detail="Task page not found")
-
-
-@app.get("/note.html")
-async def note_page():
-    """Serve subtask note page"""
-    note_path = os.path.join(frontend_path, "note.html")
-    if os.path.exists(note_path):
-        return FileResponse(note_path)
-    raise HTTPException(status_code=404, detail="Note page not found")
-
-
 @app.get("/api/v1/health")
 async def health_check():
     """Health check endpoint"""
     return {"status": "healthy", "version": APP_CONFIG["version"]}
+
+# Static files for frontend (React SPA build output)
+# Must be registered AFTER API routes so API routes take precedence
+frontend_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "frontend", "dist")
+if os.path.exists(frontend_path):
+    app.mount("/", StaticFiles(directory=frontend_path, html=True), name="static")
 
 
 if __name__ == "__main__":

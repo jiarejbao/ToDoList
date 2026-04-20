@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Detail - ToDoList</title>
+    <link rel="stylesheet" href="/static/css/linear-theme.css">
+    <link rel="stylesheet" href="/static/css/components.css">
+    <link rel="stylesheet" href="/static/css/task-page.css">
+    <link rel="stylesheet" href="/static/css/workflow-graph.css">
+    <link rel="stylesheet" href="/static/css/note-editor.css">
+</head>
+<body class="task-page">
+    <!-- Header -->
+    <header class="task-page-header">
+        <div style="display:flex;align-items:center;gap:12px;">
+            <button id="btn-back" class="btn-icon" title="Back to tasks">←</button>
+            <div>
+                <h1 id="task-title">Loading...</h1>
+                <div id="task-meta" style="font-size:12px;color:#8a8f98;margin-top:2px;"></div>
+            </div>
+        </div>
+        <div class="task-page-actions">
+            <button id="btn-new-subtask" class="btn-ghost">+ New Subtask</button>
+            <div class="link-mode-group">
+                <select id="link-type" class="link-type-select">
+                    <option value="BLOCKS">BLOCKS</option>
+                    <option value="REQUIRES">REQUIRES</option>
+                    <option value="TRIGGERS">TRIGGERS</option>
+                </select>
+                <button id="btn-link-mode" class="btn-ghost">Connect</button>
+            </div>
+            <button id="btn-toggle-note" class="btn-ghost">📝 Notes</button>
+        </div>
+    </header>
+
+    <!-- Body -->
+    <div class="task-page-body">
+        <!-- Main Content: Workflow Graph -->
+        <div class="task-page-main">
+            <div id="workflow-graph" class="workflow-graph-container">
+                <div class="empty-state">
+                    <div class="empty-state-icon">🕸️</div>
+                    <p>Loading workflow...</p>
+                </div>
+            </div>
+
+            <!-- Graph Controls -->
+            <div class="graph-controls-bar">
+                <div class="graph-controls">
+                    <button id="btn-zoom-in" class="graph-control-btn" title="Zoom in">+</button>
+                    <button id="btn-zoom-out" class="graph-control-btn" title="Zoom out">−</button>
+                    <button id="btn-fit" class="graph-control-btn" title="Fit to screen">⊡</button>
+                </div>
+                <div class="graph-legend-inline">
+                    <div class="legend-item">
+                        <div class="legend-line blocks"></div>
+                        <span>Blocks</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-line requires"></div>
+                        <span>Requires</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-line triggers"></div>
+                        <span>Triggers</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Note Sidebar -->
+        <aside class="task-page-sidebar" id="note-sidebar">
+            <div class="sidebar-header">
+                <h3>📝 Task Notes</h3>
+                <button id="btn-close-sidebar" class="btn-icon">✕</button>
+            </div>
+            <div class="sidebar-task-info">
+                <h4>Auto-save enabled</h4>
+                <p>Your notes are saved automatically as you type.</p>
+            </div>
+            <div class="sidebar-body">
+                <div id="note-editor-container"></div>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Subtask Modal (Create / Edit) -->
+    <div class="modal-overlay" id="subtask-modal" style="display:none;">
+        <div class="modal modal-sm">
+            <div class="modal-header">
+                <h3 class="modal-title" id="subtask-modal-title">New Subtask</h3>
+                <button class="btn btn-icon btn-close" id="btn-close-subtask-modal">×</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="subtask-edit-id">
+                <div class="form-group">
+                    <label class="form-label">Content *</label>
+                    <input type="text" class="form-input" id="subtask-content" placeholder="Subtask content..." required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Description</label>
+                    <textarea class="form-textarea" id="subtask-description" placeholder="Add description..."></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Due Date</label>
+                        <input type="date" class="form-input" id="subtask-due-date">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Priority</label>
+                        <select class="form-select" id="subtask-priority">
+                            <option value="1">P1 - Lowest</option>
+                            <option value="2" selected>P2 - Normal</option>
+                            <option value="3">P3 - Important</option>
+                            <option value="4">P4 - Urgent</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-ghost" id="btn-cancel-subtask">Cancel</button>
+                <button class="btn btn-primary" id="btn-save-subtask">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Context Menu -->
+    <div class="context-menu" id="node-context-menu" style="display:none;">
+        <div class="context-menu-item" data-action="edit">✎ Edit</div>
+        <div class="context-menu-item" data-action="note">📝 Open Note</div>
+        <div class="context-menu-separator"></div>
+        <div class="context-menu-item context-menu-danger" data-action="delete">🗑 Delete</div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <!-- Shared utilities -->
+    <script src="/static/js/api.js"></script>
+    <script src="/static/js/uiComponents.js"></script>
+    <!-- Task page modules -->
+    <script src="/static/js/workflowGraph.js"></script>
+    <script src="/static/js/noteEditor.js"></script>
+    <script src="/static/js/taskPage.js"></script>
+</body>
+</html>

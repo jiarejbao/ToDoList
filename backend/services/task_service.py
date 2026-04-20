@@ -4,7 +4,7 @@ Task business logic
 from datetime import datetime
 from typing import List, Optional
 
-from sqlalchemy import select, update, desc, asc
+from sqlalchemy import select, update, delete, desc, asc
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -78,19 +78,74 @@ async def get_tasks(
 
 
 async def update_task(db: AsyncSession, task_id: int, task_data: TaskUpdate) -> Optional[Task]:
-    """Update a task"""
+    """Update a task and its subtasks"""
+    from models.database import SubtaskNote, SubtaskDependency
+    
     task = await get_task(db, task_id)
     if not task:
         return None
     
-    # Update fields
+    # Update task fields (excluding subtasks)
     update_data = task_data.model_dump(exclude_unset=True)
+    subtasks_data = update_data.pop('subtasks', None)
+    
     for field, value in update_data.items():
         setattr(task, field, value)
     
     task.updated_at = datetime.utcnow()
+    
+    # Handle subtasks diff if provided
+    if subtasks_data is not None:
+        existing_subtasks = {s.id: s for s in task.subtasks}
+        incoming_ids = set()
+        
+        for sub_data in subtasks_data:
+            # sub_data is a dict (from model_dump or JSON)
+            subtask_id = sub_data.get('id')
+            
+            if subtask_id and subtask_id in existing_subtasks:
+                # Update existing subtask
+                existing = existing_subtasks[subtask_id]
+                existing.content = sub_data['content']
+                if sub_data.get('description') is not None:
+                    existing.description = sub_data['description']
+                if sub_data.get('due_date') is not None:
+                    existing.due_date = sub_data['due_date']
+                if sub_data.get('priority') is not None:
+                    existing.priority = sub_data['priority']
+                existing.updated_at = datetime.utcnow()
+                incoming_ids.add(subtask_id)
+            else:
+                # Create new subtask
+                new_subtask = Subtask(
+                    task_id=task_id,
+                    content=sub_data['content'],
+                    description=sub_data.get('description'),
+                    due_date=sub_data.get('due_date'),
+                    priority=sub_data.get('priority') or 2,
+                    order_index=sub_data.get('order_index') or len(task.subtasks),
+                )
+                db.add(new_subtask)
+        
+        # Delete subtasks not in the incoming list
+        for sub_id, subtask in existing_subtasks.items():
+            if sub_id not in incoming_ids:
+                # Cascade delete related notes and dependencies
+                await db.execute(
+                    delete(SubtaskNote).where(SubtaskNote.subtask_id == sub_id)
+                )
+                await db.execute(
+                    delete(SubtaskDependency).where(
+                        (SubtaskDependency.from_subtask_id == sub_id) |
+                        (SubtaskDependency.to_subtask_id == sub_id)
+                    )
+                )
+                await db.delete(subtask)
+    
     await db.commit()
-    await db.refresh(task)
+    
+    # Refresh task and its subtasks relationship
+    await db.refresh(task, attribute_names=['subtasks'])
     return task
 
 

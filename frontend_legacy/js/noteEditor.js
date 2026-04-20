@@ -20,6 +20,12 @@ class NoteEditor {
         // Load Tiptap dependencies
         await this.loadDependencies();
 
+        // Create save status indicator
+        this.saveStatusEl = document.createElement('div');
+        this.saveStatusEl.className = 'save-status';
+        this.saveStatusEl.style.cssText = 'font-size:11px;color:#8a8f98;text-align:right;padding:4px 0;height:20px;';
+        this.container.appendChild(this.saveStatusEl);
+
         // Create toolbar
         this.createToolbar();
 
@@ -49,11 +55,14 @@ class NoteEditor {
             onUpdate: ({ editor }) => {
                 const html = editor.getHTML();
                 this.onChange(html);
+                this.setSaveStatus('saving');
 
                 // Debounced auto-save
                 if (this.saveTimeout) clearTimeout(this.saveTimeout);
                 this.saveTimeout = setTimeout(() => {
                     this.onSave(html);
+                    this.setSaveStatus('saved');
+                    setTimeout(() => this.setSaveStatus('idle'), 2000);
                 }, 1000);
             },
             onCreate: ({ editor }) => {
@@ -175,6 +184,16 @@ class NoteEditor {
             const action = btn.dataset.action;
             btn.classList.toggle('is-active', states[action] || false);
         });
+    }
+
+    setSaveStatus(status) {
+        if (!this.saveStatusEl) return;
+        const map = {
+            idle: '',
+            saving: '<span style="color:#8a8f98;">Saving...</span>',
+            saved: '<span style="color:#10b981;">Saved</span>',
+        };
+        this.saveStatusEl.innerHTML = map[status] || '';
     }
 
     getContent() {
